@@ -76,7 +76,7 @@ pipeline {
                                             Expand-Archive -Path pipeline-scan.zip -DestinationPath veracode_scanner
                                             java -jar veracode_scanner\\pipeline-scan.jar --veracode_api_id '${VERACODE_API_ID}' \
                                             --veracode_api_key '${VERACODE_API_KEY}' \
-                                            --file app/target/verademo.war --issue_details true "79,80,89"
+                                            --file app/target/verademo.war --issue_details true --fail_on_cwe="79,80,89"
                                             """
                                 }
                             } catch (err) {
