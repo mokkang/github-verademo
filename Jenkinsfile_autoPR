@@ -47,7 +47,47 @@ pipeline {
                 }
             }
         }
-        stage ('Pipeline') {
+
+        
+
+        stage ('Veracode SCA') {
+            steps {
+                echo 'Veracode SCA'
+                withCredentials([ string(credentialsId: 'SCA_Token', variable: 'SRCCLR_API_TOKEN')]) {
+                    withMaven(maven:'maven-3') {
+                        script {
+                            if(isUnix() == true) {
+                                export SRCCLR_SCAN_COLLECTORS=Maven
+                                export SRCCLR_PR_ON="low"
+                                export SRCCLR_NO_BREAKING_UPDATES="false"
+                                export SRCCLR_IGNORE_CLOSED_PRS="true"
+                                export SRCCLR_ENABLE_PRS="true"
+                                export SRCCLR_GENERATE_PULLREQUESTS="true"
+                                
+#ignore_closed_prs: true
+#enable_prs: true
+#generate_pullrequests: true
+#PR_ON: low
+                                 sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s scan ./app --scan-collectors="mvn" --update-advisor --pull-request --allow-dirty"
+#                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --scan_collectors mvn --allow-dirty --update-advisor --pull-request"
+
+                                // debug, no upload
+                                //sh "curl -sSL https://download.sourceclear.com/ci.sh | DEBUG=1 sh -s -- scan --no-upload"
+                            }
+                            else {
+                                powershell '''
+                                            Set-ExecutionPolicy AllSigned -Scope Process -Force
+                                            $ProgressPreference = "silentlyContinue"
+                                            iex ((New-Object System.Net.WebClient).DownloadString('https://download.srcclr.com/ci.ps1'))
+                                            srcclr scan ./app
+                                            '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+               stage ('Pipeline') {
           steps {
                 echo 'Veracode Pipeline scanning'
                 withCredentials([ usernamePassword ( 
@@ -88,35 +128,6 @@ pipeline {
                     echo "Pipeline scan done (failures ignored, results avialable in ${WORKSPACE}/results.json)"
             }
         }
-        
-
-        stage ('Veracode SCA') {
-            steps {
-                echo 'Veracode SCA'
-                withCredentials([ string(credentialsId: 'SCA_Token', variable: 'SRCCLR_API_TOKEN')]) {
-                    withMaven(maven:'maven-3') {
-                        script {
-                            if(isUnix() == true) {
-                                export SRCCLR_SCAN_COLLECTORS=Maven
-                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --scan_collectors mvn --allow-dirty --update-advisor --pull-request"
-
-                                // debug, no upload
-                                //sh "curl -sSL https://download.sourceclear.com/ci.sh | DEBUG=1 sh -s -- scan --no-upload"
-                            }
-                            else {
-                                powershell '''
-                                            Set-ExecutionPolicy AllSigned -Scope Process -Force
-                                            $ProgressPreference = "silentlyContinue"
-                                            iex ((New-Object System.Net.WebClient).DownloadString('https://download.srcclr.com/ci.ps1'))
-                                            srcclr scan ./app
-                                            '''
-                            }
-                        }
-                    }
-                }
-            }
-        }
-       
     }
 }
 
