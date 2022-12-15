@@ -97,7 +97,8 @@ pipeline {
                     withMaven(maven:'maven-3') {
                         script {
                             if(isUnix() == true) {
-                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app"
+                                export SRCCLR_SCAN_COLLECTORS=Maven
+                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --allow-dirty --update-advisor --pull-request --scan_collectors=Maven"
 
                                 // debug, no upload
                                 //sh "curl -sSL https://download.sourceclear.com/ci.sh | DEBUG=1 sh -s -- scan --no-upload"
