@@ -57,12 +57,12 @@ pipeline {
                     withMaven(maven:'maven-3') {
                         script {
                             if(isUnix() == true) {
-                                export SRCCLR_SCAN_COLLECTORS="mvn"
-                                export SRCCLR_PR_ON="low"
-                                export SRCCLR_NO_BREAKING_UPDATES="false"
-                                export SRCCLR_IGNORE_CLOSED_PRS="true"
-                                export SRCCLR_ENABLE_PRS="true"
-                                export SRCCLR_GENERATE_PULLREQUESTS="true"
+                                sh "export SRCCLR_SCAN_COLLECTORS="mvn""
+                                sh "export SRCCLR_PR_ON="low""
+                                sh "export SRCCLR_NO_BREAKING_UPDATES="false""
+                                sh "export SRCCLR_IGNORE_CLOSED_PRS="true""
+                                sh "export SRCCLR_ENABLE_PRS="true""
+                                sh "export SRCCLR_GENERATE_PULLREQUESTS="true""
                                 sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s scan ./app --scan-collectors="mvn" --update-advisor --pull-request --allow-dirty"
 
                                 // debug, no upload
