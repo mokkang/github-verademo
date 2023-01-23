@@ -101,7 +101,7 @@ pipeline {
                 }
             }
     }
-        
+        }
     
 
         stage ('Veracode SCA') {
