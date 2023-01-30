@@ -1,0 +1,135 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Debug'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: PublishBuildArtifacts@1
+  displayName: Create Build Artifact for Veracode Pipeline Scan Results
+  inputs:
+    PathtoPublish: $(build.artifactStagingDirectory)
+    ArtifactName: "verademo"
+    #publishLocation: 
+    TargetPath: '$(build.artifactStagingDirectory)\WebApp.zip'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/web_comp'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)'
+    replaceExistingArchive: true
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(build.artifactstagingdirectory)'
+    Contents: |
+      **\!
+      (*.svg|*.jpg|*.cs|*.png|*.gif|*.pdf|*.aspx|*.cshtml|*.htm|*.css|*.ttf|*.woff|*.woff2|*.eot|*.js|*.resx|*.xls|*.xlsx|*.docx|*.exclude|*.txt|*.cache|*.edmx|*.csdl|*.msl|*.xml|*.resources|*.datasource|*.config|*.dlsco|*.ascx|*.html|*.json|*.php|*.side)
+    TargetFolder: '$(build.artifactstagingdirectory)/WebApp.zip'
+    CleanTargetFolder: true
+    OverWrite: true
+    ignoreMakeDirErrors: true
+###################################################################### VERACODE SOFTWARE COMPOSITION ANALYSIS #########################################################################################################
+- powershell: |
+   Set-ExecutionPolicy AllSigned -Scope Process -Force
+   $ProgressPreference = 'SilentlyContinue'
+   $Env:SRCCLR_CI_JSON=1
+   iex ((New-Object System.Net.WebClient).DownloadString('https://download.srcclr.com/ci.ps1')); srcclr scan --allow-dirty --update-advisor
+   srcclr scan $(Build.SourcesDirectory) --allow-dirty --update-advisor
+  displayName: 'Veracode SCA Agent Based Scan'
+# don't fail for demo purposes
+  continueOnError: true
+  env:
+    SRCCLR_API_TOKEN: $(SRCCLR_API_TOKEN)
+
+
+###################################################################### VERACODE STATIC PIPELINE SCAN #####################################################################
+- task: CmdLine@2
+  displayName: Veracode Pipeline Scan
+  inputs:
+    script: |
+      curl -sSO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+      unzip -o pipeline-scan-LATEST.zip
+      java -jar pipeline-scan.jar -vid $(VERACODE_API_ID) -vkey $(VERACODE_API_KEY) -f $(Build.ArtifactStagingDirectory)/WebApp.zip --issue_details true || true
+  
+###################################################################### VERACODE STATIC SANDBOX SCAN ######################################################################
+- task: Veracode@3
+  inputs:
+    ConnectionDetailsSelection: 'Endpoint'
+    AnalysisService: 'VeracodeAnalysisCenter'
+    veracodeAppProfile: 'VeraDemo-ADO'
+    version: '$(build.buildNumber)'
+    filepath: '$(build.artifactstagingdirectory)\WebApp.zip'
+    sandboxName: 'DailyBuild'
+    createSandBox: true
+    #optargs: 'Run-Pipeline-Go'
+    createProfile: true
+    importResults: true
+    maximumWaitTime: '360'
+    apiId: '$(VERACODE_API_ID)'
+    apiKey: '$(VERACODE_API_KEY)'
+    failBuildIfUploadAndScanBuildStepFails: true
+    failBuildOnPolicyFail: true
+
+###################################################################### VERACODE STATIC POLICY SCAN ######################################################################
+
+- task: Veracode@3
+  inputs:
+    ConnectionDetailsSelection: 'Endpoint'
+    AnalysisService: 'VeracodeAnalysisCenter'
+    veracodeAppProfile: 'VeraDemo-ADO'
+    version: '$(build.buildNumber)'
+    filepath: '$(build.artifactstagingdirectory)\WebApp.zip'
+    createProfile: true
+    importResults: true
+    maximumWaitTime: '360'
+    apiId: '$(VERACODE_API_ID)'
+    apiKey: '$(VERACODE_API_KEY)'
+    failBuildIfUploadAndScanBuildStepFails: true
+    failBuildOnPolicyFail: true
+
+###################################################################### VERACODE AZURE DEVOPS FLAW IMPORTER ###############################################################
+
+- task: Veracode Flaw Importer@3
+  inputs:
+    ConnectionDetailsSelection: 'Endpoint'
+    AnalysisService: 'VeracodeAnalysisCenter'
+    veracodeAppProfile: 'VeraDemo-ADO'
+    sandboxName: 'dev'
+    scanType: 'Dynamic, Static, and Software Composition Analysis'
+    importType: 'All Flaws'
+    workItemType: 'Issue'
+    area: '$(system.teamProject)'
+    overwriteAreaPathInWorkItemsOnImport: true
+    addCustomTag: 'veracodeAppProfile'
+    flawImportLimit: '1000'
