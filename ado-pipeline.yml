@@ -64,8 +64,8 @@ steps:
    Set-ExecutionPolicy AllSigned -Scope Process -Force
    $ProgressPreference = 'SilentlyContinue'
    $Env:SRCCLR_CI_JSON=1
-   iex ((New-Object System.Net.WebClient).DownloadString('https://download.srcclr.com/ci.ps1')); srcclr scan --allow-dirty --update-advisor
-   srcclr scan $(Build.SourcesDirectory) --allow-dirty --update-advisor
+   iex ((New-Object System.Net.WebClient).DownloadString('https://download.srcclr.com/ci.ps1'));
+   srcclr scan --allow-dirty --update-advisor
   displayName: 'Veracode SCA Agent Based Scan'
 # don't fail for demo purposes
   continueOnError: true
