@@ -52,6 +52,33 @@ jobs:
           createprofile: true
         continue-on-error: true
 
+      - name: Veracode Dependency Scanning
+        # You may pin to the exact commit or the version.
+        # uses: veracode/veracode-sca@8f68e021ac444b5f873e4fb4311f924b0f904f57
+        uses: veracode/veracode-sca@v2.1.6
+        with:
+          # Authorization token to query and create issues
+          github_token: ${{ github.token }}
+          # Run the SRCCLR with the `--quick` options
+#          quick: # optional, default is false
+          # Show update advisor
+          update_advisor: true
+          # A git URL to work with in case the scan is not for the current repository
+#          url: # optional, default is 
+          # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
+#          create-issues: # optional, default is false
+          # A path within the repository where the build definition starts
+          path: app/ # optional, default is .
+          # Run the SRCCLR in debug mode
+          debug: false  # optional, default is false
+          # Run the SRCCLR with the `--skip-collectors` options
+#          skip-collectors: # optional, default is false
+          # Run the SRCCLR with the `--allow-dirty` option
+          allow-dirty: true # optional, default is false
+          # Run the SRCCLR with the `--recursive` option
+#          recursive: # optional, default is false
+          # Run the SRCCLR with the `--skip-vms` option
+#          skip-vms: # optional, default is false
   #on: 
   #push:
   #  paths-ignore:
@@ -59,24 +86,21 @@ jobs:
   #schedule:
   #  - cron: 15 14 * * 6
   
-  #jobs:
-  veracode-sca-task:
-      runs-on: ubuntu-latest
-      name: Scan repository for Issues
+  #job:
+  #veracode-sca-task:
+#    runs-on: ubuntu-latest
+#    name: Scan repository for Issues
 
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v2
-   #     - name: List Directory looking for scaResults.json
-         # run: |
-    #        ls -lshart app; ls -lshart .; ls -lharts /tmp; ls -lharts ${HOME};
-        - name: Run Veracode SCA
-          env:
-            SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
-            uses: veracode/veracode-sca@v2.1.6
-            run: | 
-                curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --update-advisor --json=SCA_output.json
-                SRCCLR_API_TOKEN: '${{ secrets.SRCCLR_API_TOKEN }}'
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+ #     - name: List Directory looking for scaResults.json
+       # run: |
+  #        ls -lshart app; ls -lshart .; ls -lharts /tmp; ls -lharts ${HOME};
+#    uses: veracode/veracode-sca@v2.1.6
+#    run: | 
+#        curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --update-advisor --json=SCA_output.json
+#        SRCCLR_API_TOKEN: '${{ secrets.SRCCLR_API_TOKEN }}'
     
     #uses: actions/upload-artifact@v1
      #       with:
