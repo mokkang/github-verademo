@@ -34,7 +34,7 @@ jobs:
         # Run the SRCCLR with the `--quick` options
   #      quick: # optional, default is false
         # Show update advisor
-  #      update_advisor: # optional, default is false
+        update_advisor: true # optional, default is false
   #      # A git URL to work with in case the scan is not for the current repository
   #      url: # optional, default is 
   #      # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
