@@ -61,22 +61,22 @@ jobs:
   
   #jobs:
   veracode-sca-task:
-    runs-on: ubuntu-latest
-    name: Scan repository for Issues
+      runs-on: ubuntu-latest
+      name: Scan repository for Issues
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
- #     - name: List Directory looking for scaResults.json
-       # run: |
-  #        ls -lshart app; ls -lshart .; ls -lharts /tmp; ls -lharts ${HOME};
-      - name: Run Veracode SCA
-        env:
-          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
-    uses: veracode/veracode-sca@v2.1.6
-    run: | 
-        curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --update-advisor --json=SCA_output.json
-        SRCCLR_API_TOKEN: '${{ secrets.SRCCLR_API_TOKEN }}'
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+   #     - name: List Directory looking for scaResults.json
+         # run: |
+    #        ls -lshart app; ls -lshart .; ls -lharts /tmp; ls -lharts ${HOME};
+        - name: Run Veracode SCA
+          env:
+            SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+            uses: veracode/veracode-sca@v2.1.6
+            run: | 
+                curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --update-advisor --json=SCA_output.json
+                SRCCLR_API_TOKEN: '${{ secrets.SRCCLR_API_TOKEN }}'
     
     #uses: actions/upload-artifact@v1
      #       with:
