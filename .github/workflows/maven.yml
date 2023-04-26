@@ -27,7 +27,7 @@ jobs:
     - name: Veracode Software Composition Analysis
       # You may pin to the exact commit or the version.
       # uses: Lerer/veracode-sca@661e856c8b6a720ad6e1e430a9d2300b78b5d381
-      uses: Lerer/veracode-sca@v1.0.9
+      uses: Lerer/veracode-sca@v1.0.8
       with:
         # Authorization token to query and create issues
         github_token: ${{ secrets.GITACT }}
