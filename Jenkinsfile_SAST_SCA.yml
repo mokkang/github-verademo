@@ -42,7 +42,7 @@ pipeline {
                 withMaven(maven:'maven-3') {
                     script {
                         if(isUnix() == true) {
-                            sh 'mvn clean package'
+                            sh 'mvn clean package --file app/pom.xml'
                         }
                         else {
                             bat 'mvn clean package --file app/pom.xml'
