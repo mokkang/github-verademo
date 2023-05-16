@@ -63,7 +63,8 @@ pipeline {
                             try {
                                 if(isUnix() == true) {
                                     sh """
-                                        curl -sO https://github.com/mokkang/github-verademo/blob/main/pipeline-scan.jar 
+                                        curl -sO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+                                        unzip pipeline-scan-LATEST.zip pipeline-scan.jar
                                         java -jar pipeline-scan.jar --veracode_api_id '${VERACODE_API_ID}' \
                                             --veracode_api_key '${VERACODE_API_KEY}' \
                                             --file app/target/verademo.war 
@@ -87,6 +88,7 @@ pipeline {
                     echo "Pipeline scan done (failures ignored, results avialable in ${WORKSPACE}/results.json)"
             }
         }
+        
 
         stage ('Veracode SCA') {
             steps {
