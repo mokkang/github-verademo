@@ -1,0 +1,54 @@
+apiVersion: v1
+data:
+  base-url: https://g.codefresh.io
+  runtime: |
+    apiVersion: codefresh.io/v1alpha1
+    kind: Runtime
+    metadata:
+      creationTimestamp: null
+      name: codefresh
+      namespace: codefresh
+    spec:
+      accessMode: TUNNEL
+      bootstrapSpecifier: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/argo-cd
+      cluster: https://kubernetes.docker.internal:6443
+      components:
+      - name: events
+        type: kustomize
+        url: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/argo-events?ref=0.1.32
+        wait: true
+      - name: rollouts
+        type: kustomize
+        url: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/argo-rollouts?ref=0.1.32
+      - name: workflows
+        type: kustomize
+        url: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/argo-workflows?ref=0.1.32
+      - name: app-proxy
+        syncWave: 9
+        type: kustomize
+        url: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/app-proxy?ref=0.1.32
+      - name: internal-router
+        syncWave: 10
+        type: kustomize
+        url: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/internal-router?ref=0.1.32
+      - name: sealed-secrets
+        type: kustomize
+        url: github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/sealed-secrets?ref=0.1.32
+      - feature: ingressless
+        name: codefresh-tunnel-client
+        type: helm
+        url: github.com/codefresh-io/codefresh-tunnel-charts/codefresh-tunnel-client?ref=0.1.8
+      defVersion: null
+      ingressHost: https://62d6ffd6420bf469105040d9-codefresh.tunnels.cf-cd.com
+      ref: ""
+      repo: https://github.com/mokkang/github-verademo
+      requiredCLIVersion: ^0.1.0
+      version: 0.1.32
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: codefresh
+    codefresh.io/entity: runtimeDef
+  name: codefresh-cm
+  namespace: codefresh

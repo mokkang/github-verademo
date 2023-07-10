@@ -6,6 +6,8 @@ metadata:
     argocd.argoproj.io/sync-options: PruneLast=true
     argocd.argoproj.io/sync-wave: "-2"
   creationTimestamp: null
+  labels:
+    codefresh.io/entity: runtime
   name: codefresh
   namespace: codefresh
 spec:
@@ -64,6 +66,23 @@ spec:
               include: '{{ include }}'
               jsonnet: {}
               recurse: true
+            repoURL: ""
+  - git:
+      files:
+      - path: apps/**/codefresh/config_helm.json
+      repoURL: https://github.com/mokkang/github-verademo.git
+      requeueAfterSeconds: 20
+      revision: ""
+      template:
+        metadata: {}
+        spec:
+          destination: {}
+          project: ""
+          source:
+            chart: '{{ srcChart }}'
+            helm:
+              releaseName: codefresh-{{ appName }}
+              values: '{{ values }}'
             repoURL: ""
   syncPolicy: {}
   template:
