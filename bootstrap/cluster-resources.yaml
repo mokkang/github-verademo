@@ -4,6 +4,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
   creationTimestamp: null
+  labels:
+    codefresh.io/internal: "true"
   name: cluster-resources
   namespace: codefresh
 spec:
