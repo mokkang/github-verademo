@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: null
+  name: codefresh-sa
+  namespace: codefresh
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: codefresh-sa
+  namespace: codefresh
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: null
+  name: codefresh-sa
+  namespace: codefresh
+roleRef:
+  apiGroup: ""
+  kind: Role
+  name: codefresh-sa
+subjects:
+- kind: ServiceAccount
+  name: codefresh-sa
+  namespace: codefresh
