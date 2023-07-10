@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  creationTimestamp: null
+  name: cluster-resources
+  namespace: codefresh
+spec:
+  generators:
+  - git:
+      files:
+      - path: bootstrap/cluster-resources/*.json
+      repoURL: https://github.com/mokkang/github-verademo.git
+      requeueAfterSeconds: 20
+      revision: ""
+      template:
+        metadata: {}
+        spec:
+          destination: {}
+          project: ""
+          source:
+            repoURL: ""
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      labels:
+        codefresh.io/internal: "true"
+      name: cluster-resources-{{name}}
+      namespace: codefresh
+    spec:
+      destination:
+        server: '{{server}}'
+      ignoreDifferences:
+      - group: argoproj.io
+        jsonPointers:
+        - /status
+        kind: Application
+      project: default
+      source:
+        path: bootstrap/cluster-resources/{{name}}
+        repoURL: https://github.com/mokkang/github-verademo.git
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          selfHeal: true
+status: {}
