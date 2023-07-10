@@ -1,0 +1,18 @@
+{
+  "appName": "codefresh-tunnel-client",
+  "userGivenName": "codefresh-tunnel-client",
+  "destNamespace": "codefresh",
+  "destServer": "https://kubernetes.default.svc",
+  "srcPath": "codefresh-tunnel-client",
+  "srcRepoURL": "https://github.com/codefresh-io/codefresh-tunnel-charts.git",
+  "srcTargetRevision": "0.1.8",
+  "labels": {
+    "codefresh_io_entity": "component",
+    "codefresh_io_internal": "true"
+  },
+  "annotations": {
+    "argocd_argoproj_io_sync-wave": "0"
+  },
+  "srcChart": "",
+  "values": "tunnel:\n  ipsAllowList: \"\"\n  subdomainPrefix: 62d6ffd6420bf469105040d9-codefresh\ntunnelServer:\n  host: register-tunnels.cf-cd.com\n"
+}
