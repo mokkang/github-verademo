@@ -1,4 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- behavior: merge
+  literals:
+  - argoWorkflowsInsecure=true
+  - cfHost=https://g.codefresh.io
+  - cors=https://g.codefresh.io
+  - env=production
+  - skipPermissionsValidation=false
+  name: cap-app-proxy-cm
 kind: Kustomization
 namespace: codefresh
 resources:
