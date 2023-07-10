@@ -1,0 +1,18 @@
+{
+  "appName": "events-reporter",
+  "userGivenName": "events-reporter",
+  "destNamespace": "codefresh",
+  "destServer": "https://kubernetes.default.svc",
+  "srcPath": "apps/events-reporter/codefresh/resources",
+  "srcRepoURL": "https://github.com/mokkang/github-verademo.git",
+  "srcTargetRevision": "",
+  "labels": {
+    "codefresh_io_entity": "component",
+    "codefresh_io_internal": "true"
+  },
+  "annotations": {
+    "argocd_argoproj_io_sync-wave": "0"
+  },
+  "exclude": "",
+  "include": ""
+}
