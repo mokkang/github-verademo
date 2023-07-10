@@ -1,0 +1,18 @@
+{
+  "appName": "isc",
+  "userGivenName": "isc",
+  "destNamespace": "codefresh",
+  "destServer": "https://kubernetes.default.svc",
+  "srcPath": "runtimes/codefresh",
+  "srcRepoURL": "https://github.com/mokkang/codefresh-runtime-internal-shared-config.git",
+  "srcTargetRevision": "",
+  "labels": {
+    "codefresh_io_entity": "shared-configuration",
+    "codefresh_io_internal": "true"
+  },
+  "annotations": {
+    "argocd.argoproj.io/sync-wave": "10"
+  },
+  "exclude": "",
+  "include": ""
+}
