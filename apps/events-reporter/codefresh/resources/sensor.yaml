@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: cf
+  name: events-reporter
+  namespace: codefresh
+spec:
+  dependencies:
+  - eventName: events
+    eventSourceName: events-reporter
+    name: events
+  eventBusName: codefresh-eventbus
+  template:
+    container:
+      name: ""
+      resources: {}
+  triggers:
+  - retryStrategy:
+      duration: 0
+      steps: 3
+    template:
+      conditions: events
+      http:
+        headers:
+          Content-Type: application/json
+        method: POST
+        payload:
+        - dest: data
+          src:
+            dataKey: body
+            dependencyName: events
+        secureHeaders:
+        - name: Authorization
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: codefresh-token
+        url: https://g.codefresh.io/2.0/api/events
+      name: events
+status: {}

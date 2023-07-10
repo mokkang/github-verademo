@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: cf
+  name: events-reporter
+  namespace: codefresh
+spec:
+  eventBusName: codefresh-eventbus
+  generic:
+    events:
+      authSecret:
+        key: token
+        name: argocd-token
+      config: '{}'
+      insecure: true
+      url: argocd-server.codefresh.svc:80
+  template:
+    container:
+      name: ""
+      resources: {}
+status: {}
