@@ -121,7 +121,7 @@ jobs:
     - name: Pipeline Scan
       run: |
         cd /github/home/app/target
-        java -jar /opt/veracode/pipeline-scan.jar --veracode_api_id="${{secrets.VERACODE_API_ID}}" --veracode_api_key="${{secrets.VERACODE_API_KEY}}" --fail_on_severity="Very High, High" --file="verademo.war" --json_output_file="results.json"
+        java -jar /opt/veracode/pipeline-scan.jar --veracode_api_id="${{secrets.VERACODE_API_ID}}" --veracode_api_key="${{secrets.VERACODE_API_KEY}}" --fail_on_severity="Very High, High" --filepath=./verademo.war --json_output_file="results.json"
       continue-on-error: true
 
     - uses: actions/upload-artifact@v2
