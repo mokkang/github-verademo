@@ -1,6 +1,3 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
 
 
 name: Upload-Scan-Policy-SCA
@@ -90,28 +87,3 @@ jobs:
         #  quick: true
         #  create-issues: true 
         #  fail-on-cvss: 1
-      #  # Authorization token to query and create issues
-      #  github_token: ${{ secrets.GITACT }}
-      #  SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
-        # 
-        #quick: # optional, default is false
-        # Show update advisor
-      #  update_advisor: true
-        # A git URL to work with in case the scan is not for the current repository
-        #url: # optional, default is 
-        # The minimum CVSS value for vulnerability to be added as an issue
-        #min-cvss-for-issue: # optional, default is 0
-        # The maximum allowed cvss in found vulnerabilities to pass the step
-        #fail-on-cvss: # optional, default is 10
-        # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
-        #create-issues: # optional, default is false
-        # A path within the repository where the build definition starts
-       # path: ./app
-        # Run the SRCCLR in debug mode
-        #debug: # optional, default is false
-        # Run the SRCCLR with the `--skip-collectors` options
-        #skip-collectors: # optional, default is false
-        # Run the SRCCLR with the `--allow-dirty` option
- #       allow-dirty: true # optional, default is false
-        # Run the SRCCLR with the `--recursive` option
-        #recursive: # optional, default is false
