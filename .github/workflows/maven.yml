@@ -30,13 +30,14 @@ jobs:
     - name: Veracode Dependency Scanning
       # You may pin to the exact commit or the version.
       # uses: veracode/veracode-sca@f910b2a575b6c43db72a46a9334d0883f7c0a91a
-      uses: veracode/veracode-sca@v2.1.9
+      
       env:
-        SRCCLR_API_TOKEN: '${{ env.SRCCLR_API_TOKEN }}
+        SRCCLR_API_TOKEN: '${{ env.SRCCLR_API_TOKEN }}'
+
+      uses: veracode/veracode-sca@v2.1.9
       with:
         # Authorization token to query and create issues
         github_token: ${{ github.token }}
-        # Run the SRCCLR with the `--quick` options
         #quick: # optional, default is false
         # Show update advisor
         update_advisor: true # optional, default is false
