@@ -27,6 +27,11 @@ jobs:
  #   - name: Veracode Software Composition Analysis
       # You may pin to the exact commit or the version.
       # uses: Lerer/veracode-sca@661e856c8b6a720ad6e1e430a9d2300b78b5d381
+    
+    - name: Veracode Dependency Scanner
+      run: curl -sSL https://download.srcclr.com/ci.sh | sh 
+   #uses: ubuntu-latest
+    
     - name: Veracode Dependency Scanning
       # You may pin to the exact commit or the version.
       # uses: veracode/veracode-sca@f910b2a575b6c43db72a46a9334d0883f7c0a91a
