@@ -41,7 +41,7 @@ jobs:
         # A git URL to work with in case the scan is not for the current repository
         #url: # optional, default is 
         # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
-        create-issues: true # optional, default is false
+      #  create-issues: true # optional, default is false
         # A path within the repository where the build definition starts
         path: ./app # optional, default is .
         # Run the SRCCLR in debug mode
