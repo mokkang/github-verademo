@@ -1,72 +1,95 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Veracode SCA 
 
+
+name: Upload-Scan-Policy-SCA
+
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ "main" ]
+    branches: [ master ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ master ]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # This workflow contains a single job called "build"
   build:
-
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file app/pom.xml
- #   - name: Veracode Software Composition Analysis
-      # You may pin to the exact commit or the version.
-      # uses: Lerer/veracode-sca@661e856c8b6a720ad6e1e430a9d2300b78b5d381
-    
-    - name: Veracode Dependency Scanner
-      run: curl -sSL https://download.srcclr.com/ci.sh | sh 
-   #uses: ubuntu-latest
-    
-    - name: Veracode Dependency Scanning
-      # You may pin to the exact commit or the version.
-      # uses: veracode/veracode-sca@f910b2a575b6c43db72a46a9334d0883f7c0a91a
-      
-      env:
-        SRCCLR_API_TOKEN: '${{ env.SRCCLR_API_TOKEN }}'
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-      uses: veracode/veracode-sca@v2.1.9
-      with:
-        # Authorization token to query and create issues
-        github_token: ${{ github.token }}
-        #quick: # optional, default is false
-        # Show update advisor
-        update_advisor: true # optional, default is false
-        # A git URL to work with in case the scan is not for the current repository
-        #url: # optional, default is 
-        # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
-      #  create-issues: true # optional, default is false
-        # A path within the repository where the build definition starts
-        path: ./app # optional, default is .
-        # Run the SRCCLR in debug mode
-        #debug: # optional, default is false
-        # Run the SRCCLR with the `--skip-collectors` options
-        #skip-collectors: # optional, default is false
-        # Run the SRCCLR with the `--allow-dirty` option
-        allow-dirty: true # optional, default is false
-        # Run the SRCCLR with the `--recursive` option
-        #recursive: # optional, default is false
-        # Run the SRCCLR with the `--skip-vms` option
-        #skip-vms: # optional, default is false
-        # Run the SRCCLR with the `--no-graphs` option
-        #no-graphs: # optional, default is false
-  
-      #uses: Lerer/veracode-sca@v1.0.8
-      #with:
+      - uses: actions/setup-java@v1 # Make java accessible on path so the uploadandscan action can run.
+        with: 
+          java-version: '8'
+
+      - name: Build with Maven
+        run: mvn -B package --file app/pom.xml
+
+      - name: List files in the repository
+        run: |
+          ls -al ${{ github.workspace }}
+      - uses: actions/upload-artifact@v2 # Copy files from repository to docker container so the next uploadandscan action can access them.
+        with:
+          name: CodePackage
+          path: '**/*.war' # Wildcards can be used to filter the files copied into the container. See: https://github.com/actions/upload-artifact
+
+      - uses: veracode/veracode-uploadandscan-action@master # Run the uploadandscan action. Inputs are described above.
+        with:
+          #appname: '${{ secrets.VERACODE_APP_NAME }}'
+          appname: '${{github.repository}}'
+          filepath: app/target/verademo.war
+          vid: ${{ secrets.VERACODE_API_ID }}'
+          vkey: '${{ secrets.VERACODE_API_KEY }}'
+          scantimeout: 60
+          #createprofile: false
+          createprofile: true
+        continue-on-error: true
+
+  #on: 
+  #push:
+  #  paths-ignore:
+  #    - "README.md"
+  #schedule:
+  #  - cron: 15 14 * * 6
+
+  #jobs:
+  veracode-sca-task:
+    runs-on: ubuntu-latest
+    name: Scan repository for Issues
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: List Directory looking for scaResults.json
+        run: |
+          ls -lshart app; ls -lshart .; ls -lharts /tmp; ls -lharts ${HOME};
+      - name: Run Veracode SCA
+        env:
+          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+        #uses: veracode/veracode-sca@v1.09
+        run: |
+           export SCAN_DIR="./app/" 
+           curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan --json=scaResults.json
+           ls -lharts *.json
+      - uses: actions/upload-artifact@v1
+        with:
+          name: SCAResults
+          path: scaResults.json
+        #with:
+        #  github_token: ${{ secrets.GITHUB_TOKEN }}
+        #  quick: true
+        #  create-issues: true 
+        #  fail-on-cvss: 1
       #  # Authorization token to query and create issues
       #  github_token: ${{ secrets.GITACT }}
       #  SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
