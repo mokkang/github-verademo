@@ -27,15 +27,45 @@ jobs:
     - name: Veracode Software Composition Analysis
       # You may pin to the exact commit or the version.
       # uses: Lerer/veracode-sca@661e856c8b6a720ad6e1e430a9d2300b78b5d381
-      uses: Lerer/veracode-sca@v1.0.8
+    - name: Veracode Dependency Scanning
+      # You may pin to the exact commit or the version.
+      # uses: veracode/veracode-sca@f910b2a575b6c43db72a46a9334d0883f7c0a91a
+      uses: veracode/veracode-sca@v2.1.9
       with:
         # Authorization token to query and create issues
-        github_token: ${{ secrets.GITACT }}
-        SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+        github_token: ${{ github.token }}
+        # Run the SRCCLR with the `--quick` options
+        #quick: # optional, default is false
+        # Show update advisor
+        update_advisor: true # optional, default is false
+        # A git URL to work with in case the scan is not for the current repository
+        #url: # optional, default is 
+        # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
+        create-issues: true # optional, default is false
+        # A path within the repository where the build definition starts
+        path: ./app # optional, default is .
+        # Run the SRCCLR in debug mode
+        #debug: # optional, default is false
+        # Run the SRCCLR with the `--skip-collectors` options
+        #skip-collectors: # optional, default is false
+        # Run the SRCCLR with the `--allow-dirty` option
+        allow-dirty: true # optional, default is false
+        # Run the SRCCLR with the `--recursive` option
+        #recursive: # optional, default is false
+        # Run the SRCCLR with the `--skip-vms` option
+        #skip-vms: # optional, default is false
+        # Run the SRCCLR with the `--no-graphs` option
+        #no-graphs: # optional, default is false
+  
+      #uses: Lerer/veracode-sca@v1.0.8
+      #with:
+      #  # Authorization token to query and create issues
+      #  github_token: ${{ secrets.GITACT }}
+      #  SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
         # 
         #quick: # optional, default is false
         # Show update advisor
-        update_advisor: true
+      #  update_advisor: true
         # A git URL to work with in case the scan is not for the current repository
         #url: # optional, default is 
         # The minimum CVSS value for vulnerability to be added as an issue
@@ -45,7 +75,7 @@ jobs:
         # An attribute to instruct the action to create an issue from found vulnerability or just simple text output
         #create-issues: # optional, default is false
         # A path within the repository where the build definition starts
-        path: ./app
+       # path: ./app
         # Run the SRCCLR in debug mode
         #debug: # optional, default is false
         # Run the SRCCLR with the `--skip-collectors` options
