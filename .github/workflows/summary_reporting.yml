@@ -15,7 +15,13 @@ jobs:
     steps: 
       - name: get summary report
         run: |
+          cd && mkdir .veracode 
+          cd .veracode && touch credentials
+          echo "[default]" > credentials
+          echo "veracode_api_key_id=${{ env.VERACODE_API_ID }}"
+          echo "veracode_api_key_secret=${{ env.VERACODE_API_KEY }}"
           cd /tmp
+          
           export VERACODE_API_ID=${{ env.API_ID }}
           export VERACODE_API_KEY=${{ env.API_KEY }}
           ID=$(http --auth-type veracode_hmac GET "https://api.veracode.com/appsec/v1/applications/?name=${{ env.APP_NAME }}" | jq -r '._embedded.applications[0].id')
