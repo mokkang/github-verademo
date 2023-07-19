@@ -81,6 +81,6 @@ jobs:
         # Run the SRCCLR with the `--skip-collectors` options
         #skip-collectors: # optional, default is false
         # Run the SRCCLR with the `--allow-dirty` option
-        allow-dirty: true # optional, default is false
+ #       allow-dirty: true # optional, default is false
         # Run the SRCCLR with the `--recursive` option
         #recursive: # optional, default is false
