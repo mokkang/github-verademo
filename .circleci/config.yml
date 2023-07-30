@@ -75,8 +75,8 @@ jobs:
       - run:
           name: "Upload and Scan SCA, SAST (Policy or Sandbox)"
           command: java -jar /opt/veracode/api-wrapper.jar 
-            -vid $VERACODE_API_ID
-            -vkey $VERACODE_API_KEY
+            -vid=$VERACODE_API_ID
+            -vkey=$VERACODE_API_KEY
             -action UploadAndScan 
             -appname "VeraDemo-Circle-CI" 
             -createprofile true 
