@@ -34,7 +34,7 @@ jobs:
       - run:
           name: "Veracode Agent-based SCA"
           command: |
-            curl -sSL https://download.sourceclear.com/ci.sh | sh - -s ./app --allow-dirty --update-advisor 
+            curl -sSL https://download.sourceclear.com/ci.sh | sh - scan ./app --allow-dirty --update-advisor 
 
 # Veracode Pipeline Scan SAST using docker image, which contains the Pipeline Scan jar file. Uses API ID/KEY environment variables. 
 # Takes artifact from build step and uploads to Veracode servers for scanning (see -f parameter).
@@ -49,8 +49,8 @@ jobs:
       - run:
           name: "Veracode Pipeline Scan SAST"
           command: java -jar /opt/veracode/pipeline-scan.jar 
-            -vid $VERACODE_API_ID
-            -vkey $VERACODE_API_KEY
+            -vid=$VERACODE_API_ID
+            -vkey=$VERACODE_API_KEY
             -f ./app/target/verademo.war
 
       - run:
@@ -75,8 +75,8 @@ jobs:
       - run:
           name: "Upload and Scan SCA, SAST (Policy or Sandbox)"
           command: java -jar /opt/veracode/api-wrapper.jar 
-            -vid $VERACODE_API_ID
-            -vkey $VERACODE_API_KEY
+            -vid=$VERACODE_API_ID
+            -vkey=$VERACODE_API_KEY
             -action UploadAndScan 
             -appname "VeraDemo-Circle-CI" 
             -createprofile true 
@@ -100,4 +100,3 @@ workflows:
       - Veracode-UploadandScanSASTSCA:
           requires:
           - build
-      
