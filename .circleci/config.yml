@@ -1,0 +1,102 @@
+  # Needs env variables setting for VERACODE_API_ID, VERACODE_API_KEY and SRCCLR_API_TOKEN
+
+# Uses Openjdk image to build application using Maven, then persists build output. Always reference Veracode build packaging guidance at https://docs.veracode.com/r/compilation_packaging for your language/framework.
+# If you have questions about how to package your application correctly, schedule a consultation in the application profile on the Veracode platform with an Applciation Security Consultant.
+# Please note, the Applciation Security Consultant will not be able to assist with pipeline config. Contact your Veracode CSE for assistance with this.
+
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: mvn -B -DskipTests clean package -f app/pom.xml
+
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - target
+            - ./
+
+# Agent-based SCA scan submission, scans repo directly, does not require built artifact. 
+# Requires SRCCLR_API_TOKEN to be generated on platform then saved as secret for use here.
+# Sourceclear was acquired by Veracode in 2018 - this is a trusted domain. The script will download the agent, run it for the purposes of scan, then delete itself.
+
+  Veracode-AgentbasedSCA:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Veracode Agent-based SCA"
+          command: |
+            curl -sSL https://download.sourceclear.com/ci.sh | sh - scan ./app --allow-dirty --update-advisor 
+
+# Veracode Pipeline Scan SAST using docker image, which contains the Pipeline Scan jar file. Uses API ID/KEY environment variables. 
+# Takes artifact from build step and uploads to Veracode servers for scanning (see -f parameter).
+# Note: this scan type could also be conducted outside of a docker image by downloading and calling the wrapper directly.
+
+  Veracode-PipelineScanSAST:
+    docker:
+      - image: veracode/pipeline-scan:latest
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Veracode Pipeline Scan SAST"
+          command: java -jar /opt/veracode/pipeline-scan.jar 
+            -vid=$VERACODE_API_ID
+            -vkey=$VERACODE_API_KEY
+            -f ./app/target/verademo.war
+
+      - run:
+          name: Storing artifacts
+          command: |
+            mkdir /tmp/artifacts;
+      - store_artifacts:
+          path: /home/luser/project/results.json
+
+# Upload and Scan SAST, SCA (Policy or Sandbox Scan) using docker image. A number of parameters can be passed, see docs.veracode.com for relevant article.
+# Takes artifact built earlier and uploads to Veracode platform for scanning.
+# If no sandbox parameter  is specified, Policy Scan will take place.
+# Avoid exposing credentials in pipeline, set API ID and KEY as secrets.
+# Note: this scan type could also be conducted outside of a docker image by downloading and calling the wrapper directly.
+
+  Veracode-UploadandScanSASTSCA:
+    docker:
+      - image: veracode/api-wrapper-java:latest
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Upload and Scan SCA, SAST (Policy or Sandbox)"
+          command: java -jar /opt/veracode/api-wrapper.jar 
+            -vid=$VERACODE_API_ID
+            -vkey=$VERACODE_API_KEY
+            -action UploadAndScan 
+            -appname "VeraDemo-Circle-CI" 
+            -createprofile true 
+            -autoscan true
+            -filepath ./app/target/verademo.war
+            -version CircleCI-$CIRCLE_BUILD_NUM
+            -scantimeout 30
+
+# CircleCI workflow pattern
+
+workflows:
+  Veracodescanning: 
+    jobs:
+      - build
+      - Veracode-AgentbasedSCA:
+          requires:
+          - build
+      - Veracode-PipelineScanSAST:
+          requires:
+          - build
+      - Veracode-UploadandScanSASTSCA:
+          requires:
+          - build
