@@ -118,7 +118,7 @@ pipeline {
         //  uses the natively installed docker
        
     }
-}
+
 
         stage ('Veracode SCA') {
             steps {
