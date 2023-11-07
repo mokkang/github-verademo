@@ -1,6 +1,8 @@
 name: Detailed Report PDF
 
-on: workflow_dispatch
+on:
+  push: 
+  #workflow_dispatch
 env:
   API_ID: ${{ secrets.VERACODE_API_ID }}
   API_KEY: ${{ secrets.VERACODE_API_KEY }}
