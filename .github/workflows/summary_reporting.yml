@@ -9,18 +9,18 @@ env:
 jobs:
 
   get_summary_report:
-    runs-on: ubuntu-latest
+    runs-on: maven-latest
     container:
       image: veracode/api-signing:latest
     steps: 
       - name: get summary report
         run: |
-          cd && mkdir .veracode 
-          cd .veracode && touch credentials
-          echo "[default]" > credentials
+          # cd && mkdir .veracode 
+          # cd .veracode && touch credentials
+          # echo "[default]" > credentials
           echo "veracode_api_key_id=${{ env.VERACODE_API_ID }}"
           echo "veracode_api_key_secret=${{ env.VERACODE_API_KEY }}"
-          cd /tmp
+          # cd /tmp
           
           export VERACODE_API_ID=${{ env.API_ID }}
           export VERACODE_API_KEY=${{ env.API_KEY }}
@@ -28,11 +28,11 @@ jobs:
           echo GUID: ${ID}
           BUILD_ID=$(http --auth-type veracode_hmac GET "https://analysiscenter.veracode.com/api/5.0/getbuildinfo.do?app_id=$ID" | sed -n 's/.*build_id="\([0-9]*\)".*/\1/p')
           echo Build ID: $BUILD_ID
-          http --auth-type veracode_hmac -o summaryreport.pdf GET "https://analysiscenter.veracode.com/api/4.0/summaryreportpdf.do?build_id=$BUILD_ID"
+          http --auth-type=veracode_hmac -o summaryreport.pdf GET "https://analysiscenter.veracode.com/api/4.0/summaryreportpdf.do?build_id=$BUILD_ID"
         
       - name: upload PDF report
         uses: actions/upload-artifact@v2
         with:
           name: summary-report
-          path: /tmp/summaryreport.pdf
+          path: summaryreport.pdf
         
