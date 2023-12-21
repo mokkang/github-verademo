@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: maven-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -54,7 +54,7 @@ jobs:
 # 	(obviously) Change the name=<app_name> in the first http call to be 
 #	the name of your Application on the Veracode platform
   get-policy-flaws:
-    runs-on: ubuntu-latest
+    runs-on: maven-latest
     container: 
       image: veracode/api-signing:latest
     steps:
@@ -103,8 +103,8 @@ jobs:
       - name: get summary report
         run: |
           cd /tmp
-          export VERACODE_API_KEY_ID=${{ env.API_ID }}
-          export VERACODE_API_KEY_SECRET=${{ env.API_KEY }}
+          export VERACODE_API_KEY_ID=${{ env.VERACODE_API_ID }}
+          export VERACODE_API_KEY_SECRET=${{ env.VERACODE_API_KEY }}
           ID=$(http --auth-type veracode_hmac GET "https://api.veracode.com/appsec/v1/applications/?name=${{ env.APP_NAME }}" | jq -r '._embedded.applications[0].id')
           echo GUID: ${ID}
           BUILD_ID=$(http --auth-type veracode_hmac GET "https://analysiscenter.veracode.com/api/5.0/getbuildinfo.do?app_id=$ID" | sed -n 's/.*build_id="\([0-9]*\)".*/\1/p')
