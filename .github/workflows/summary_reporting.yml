@@ -7,7 +7,7 @@ env:
   APP_NAME: VeraDemo
 
 jobs:
-
+ 
   get_summary_report:
     runs-on: maven-latest
     container:
