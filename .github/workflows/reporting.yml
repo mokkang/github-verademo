@@ -3,7 +3,7 @@ name: Detailed Report PDF
 on:
   push: 
   #workflow_dispatch
-env:
+env: 
   API_ID: ${{ secrets.VERACODE_API_ID }}
   API_KEY: ${{ secrets.VERACODE_API_KEY }}
   APP_NAME: VeraGHA
