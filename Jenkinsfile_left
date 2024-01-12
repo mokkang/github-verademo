@@ -56,7 +56,7 @@ pipeline {
                     withMaven(maven:'maven-3') {
                         script {
                             if(isUnix() == true) {
-                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app" 
+                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app" --update-advisor
 
                                 // debug, no upload
                                 //sh "curl -sSL https://download.sourceclear.com/ci.sh | DEBUG=1 sh -s -- scan --no-upload"
@@ -90,7 +90,7 @@ pipeline {
                                         unzip pipeline-scan-LATEST.zip pipeline-scan.jar
                                         java -jar pipeline-scan.jar --veracode_api_id '${VERACODE_API_ID}' \
                                             --veracode_api_key '${VERACODE_API_KEY}' \
-                                            --file app/target/verademo.war || true
+                                            --file app/target/verademo.war --fail_on_cwe="79,80,89,113,117"
                                         """
                                 }
                                 else {
