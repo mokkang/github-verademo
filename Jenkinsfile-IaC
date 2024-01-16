@@ -87,6 +87,11 @@ pipeline {
                                 if(isUnix() == true) {
                                     sh """
                                             curl -fsS https://tools.veracode.com/veracode-cli/install | sh 
+                                            mkdir .veracode
+                                            touch .veracode/veracode.yml
+                                            echo "api:
+    key-id: ${VERACODE_API_ID} 
+    key-secret: ${VERACODE_API_KEY}" > .veracode/veracode.yaml
                                             ./veracode configure 
                                             ./veracode scan --source maven:3.5.3 --type image --format table
                                         """
