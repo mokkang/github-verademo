@@ -1,136 +1,28 @@
 pipeline {
-    agent any
-
+    agent {
+        label 'ubuntu-latest' // Adjust this based on your Jenkins agent configuration
+    }
+    triggers {
+        branch 'main'
+    }
     environment {
-        VERACODE_APP_NAME = 'VeraDemo'      // App Name in the Veracode Platform
+        VERACODE_API_KEY_ID = credentials('${VERACODE_API_ID}') // Use Jenkins credentials system
+        VERACODE_API_KEY_SECRET = credentials('${VERACODE_API_KEY}') // Use Jenkins credentials system
     }
-
-    // this is optional on Linux, if jenkins does not have access to your locally installed docker
-    //tools {
-        // these match up with 'Manage Jenkins -> Global Tool Config'
-        //'org.jenkinsci.plugins.docker.commons.tools.DockerTool' 'docker-latest' 
-    //}
-
-    options {
-        // only keep the last x build logs and artifacts (for space saving)
-        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
-    }
-
-    stages{
-        stage ('environment verify') {
+    stages {
+        stage('Veracode Container Scan & SBOM') {
             steps {
                 script {
-                    if (isUnix() == true) {
-                        sh 'pwd'
-                        sh 'ls -la'
-                        sh 'echo $PATH'
-                    }
-                    else {
-                        bat 'dir'
-                        bat 'echo %PATH%'
-                    }
+                    // Install Veracode-cli and authenticate
+                    sh '''
+                    curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+                    ./veracode scan --source https://github.com/veracode/verademo --type repo --format json --output ./veracode_container_scan.json
+                    ./veracode scan --source https://github.com/veracode/verademo --type repo --format json --output ./sbom.json
+                    ./veracode scan --source https://github.com/veracode/verademo-dotnet --type repo --format json --output ./veracode_container_scan_dotnet.json
+                    ./veracode sbom --source https://github.com/veracode/verademo-dotnet --type repo --format json --output ./sbom_dotnet.json
+                    '''
                 }
             }
         }
-
-       
-        stage ('build') {
-            steps {
-                withMaven(maven:'maven-3') {
-                    script {
-                        if(isUnix() == true) {
-                            sh 'mvn clean package -f app/pom.xml'
-                        }
-                        else {
-                            bat 'mvn clean package -f app/pom.xml'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage ('Veracode SCA') {
-            steps {
-                echo 'Veracode SCA'
-                withCredentials([ string(credentialsId: 'SCA_Token', variable: 'SRCCLR_API_TOKEN')]) {
-                    withMaven(maven:'maven-3') {
-                        script {
-                            if(isUnix() == true) {
-                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh -s -- scan ./app --update-advisor"
-
-                                // debug, no upload
-                                //sh "curl -sSL https://download.sourceclear.com/ci.sh | DEBUG=1 sh -s -- scan --no-upload"
-                            }
-                            else {
-                                powershell '''
-                                            '''
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        stage ('Pipeline') {
-          steps {
-                echo 'Veracode Pipeline scanning'
-                withCredentials([ usernamePassword ( 
-                    credentialsId: 'veracode_login', usernameVariable: 'VERACODE_API_ID', passwordVariable: 'VERACODE_API_KEY') ]) {
-                        script {
-
-                            // this try-catch block will show the flaws in the Jenkins log, and yet not
-                            // fail the build due to any flaws reported in the pipeline scan
-                            // alternately, you could add --fail_on_severity '', but that would not show the
-                            // flaws in the Jenkins log
-
-                            // issue_details true: add flaw details to the results.json file
-                            try {
-                                if(isUnix() == true) {
-                                    sh """
-                                            curl -fsS https://tools.veracode.com/veracode-cli/install | sh 
-                                            mkdir .veracode
-                                            touch .veracode/veracode.yml
-                                            echo "api:
-    key-id: ${VERACODE_API_ID} 
-    key-secret: ${VERACODE_API_KEY}" > .veracode/veracode.yaml
-                                            ./veracode scan --source maven:3.5.3 --type image --format table
-                                        """
-                                }
-                                
-                            } catch (err) {
-                                echo 'Veracode IaC ' + err
-                            }
-                        }    
-                    } 
-
-                    echo "Container Scanning Done  ${WORKSPACE}/results.json)"
-            }
-        }
-        
-
-        stage ('Veracode scan') {
-            steps {
-                script {
-                    if(isUnix() == true) {
-                        env.HOST_OS = 'Unix'
-                    }
-                    else {
-                        env.HOST_OS = 'Windows'
-                    }
-                }
-
-                echo 'Veracode scanning'
-                withCredentials([ usernamePassword ( 
-                    credentialsId: 'veracode_login', usernameVariable: 'VERACODE_API_ID', passwordVariable: 'VERACODE_API_KEY') ]) {
-                        // fire-and-forget 
-                        veracode applicationName: "${VERACODE_APP_NAME}", criticality: 'VeryHigh', debug: true, fileNamePattern: '', pHost: '', pPassword: '', pUser: '', replacementPattern: '', sandboxName: '', scanExcludesPattern: '', scanIncludesPattern: '', scanName: "${BUILD_TAG}-${env.HOST_OS}", uploadExcludesPattern: '', uploadIncludesPattern: 'app/target/verademo.war', vid: "${VERACODE_API_ID}", vkey: "${VERACODE_API_KEY}"
-
-                        // wait for scan to complete (timeout: x)
-                        //veracode applicationName: '${VERACODE_APP_NAME}'', criticality: 'VeryHigh', debug: true, timeout: 20, fileNamePattern: '', pHost: '', pPassword: '', pUser: '', replacementPattern: '', sandboxName: '', scanExcludesPattern: '', scanIncludesPattern: '', scanName: "${BUILD_TAG}", uploadExcludesPattern: '', uploadIncludesPattern: 'app/target/verademo.war', vid: '${VERACODE_API_ID}', vkey: '${VERACODE_API_KEY}'
-                    }      
-            }
-        }
-        // only works on *nix, as we're building a Linux image
-        //  uses the natively installed docker
-       
     }
 }
