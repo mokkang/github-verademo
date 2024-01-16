@@ -2,9 +2,6 @@ pipeline {
     agent {
         label 'ubuntu-latest' // Adjust this based on your Jenkins agent configuration
     }
-    triggers {
-        branch 'main'
-    }
     environment {
         VERACODE_API_KEY_ID = credentials('${VERACODE_API_ID}') // Use Jenkins credentials system
         VERACODE_API_KEY_SECRET = credentials('${VERACODE_API_KEY}') // Use Jenkins credentials system
