@@ -86,29 +86,19 @@ pipeline {
                             try {
                                 if(isUnix() == true) {
                                     sh """
-                                        curl -sO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-                                        unzip pipeline-scan-LATEST.zip pipeline-scan.jar
-                                        java -jar pipeline-scan.jar --veracode_api_id '${VERACODE_API_ID}' \
-                                            --veracode_api_key '${VERACODE_API_KEY}' \
-                                            --file app/target/verademo.war --fail_on_cwe="79,80,89,113,117"
+                                            curl -fsS https://tools.veracode.com/veracode-cli/install | sh 
+                                            ./veracode configure 
+                                            ./veracode scan --source maven:3.5.3 --type image --format table
                                         """
                                 }
-                                else {
-                                    powershell """
-                                            curl  https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip -o pipeline-scan.zip
-                                            Expand-Archive -Path pipeline-scan.zip -DestinationPath veracode_scanner
-                                            java -jar veracode_scanner\\pipeline-scan.jar --veracode_api_id '${VERACODE_API_ID}' \
-                                            --veracode_api_key '${VERACODE_API_KEY}' \
-                                            --file app/target/verademo.war 
-                                            """
-                                }
+                                
                             } catch (err) {
-                                echo 'Pipeline err: ' + err
+                                echo 'Veracode IaC ' + err
                             }
                         }    
                     } 
 
-                    echo "Pipeline scan done (failures ignored, results avialable in ${WORKSPACE}/results.json)"
+                    echo "Container Scanning Done  ${WORKSPACE}/results.json)"
             }
         }
         
