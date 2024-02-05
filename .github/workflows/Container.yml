@@ -1,7 +1,8 @@
 name: Veracode Container Scanning
 
 on:
-  workflow_dispatch:
+  push:
+#  workflow_dispatch:
 
 jobs:
   container: 
