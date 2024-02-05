@@ -1,0 +1,28 @@
+name: Veracode Container Scanning
+
+on:
+  workflow_dispatch:
+
+jobs:
+  container: 
+    name: Container Security
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Check out branch
+        uses: actions/checkout@v2
+  
+      - name: Container Security 
+        run: |
+            pwd
+            export VERACODE_API_KEY_ID=${{ secrets.VERACODE_API_ID }}
+            export VERACODE_API_KEY_SECRET=${{ secrets.VERACODE_API_KEY }}
+            curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+            ./veracode configure
+            ./veracode scan --source /home/runner/work/verademo/verademo --type directory --format json --output ./veracode_container_scan.json
+    
+      - name: save output file
+        uses: actions/upload-artifact@v2
+        with:
+          name: json-report
+          path: ./veracode_container_scan.json
+          
