@@ -1,8 +1,8 @@
 name: Veracode Container Scanning
 
 on:
-  workflow_dispatch:
-
+  #workflow_dispatch:
+  push:
 jobs:
   container_scanning: 
     name: Container Security
