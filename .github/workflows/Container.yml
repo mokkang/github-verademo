@@ -14,7 +14,13 @@ jobs:
   
       - name: Container Security 
         run: |
-            pwd
+            pwd        
+            ls -lhart
+            mkdir /home/luser/.veracode
+            touch /home/luser/.veracode/credentials
+            echo "[default]" > /home/luser/.veracode/credentials
+            echo "veracode_api_key_id=${{ secrets.VERACODE_API_ID }}" >> /home/luser/.veracode/credentials
+            echo "veracode_api_key_secret=${{ secrets.VERACODE_API_KEY }}" >> /home/luser/.veracode/credentials
             export VERACODE_API_KEY_ID=${{ secrets.VERACODE_API_ID }}
             export VERACODE_API_KEY_SECRET=${{ secrets.VERACODE_API_KEY }}
             curl -fsS https://tools.veracode.com/veracode-cli/install | sh
