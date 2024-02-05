@@ -1,28 +1,27 @@
 name: Veracode Container Scanning
-
 on:
-  #workflow_dispatch:
-  push:
+#  workflow_dispatch:
+  push:    
+
 jobs:
-  container_scanning: 
-    name: Container Security
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Check out branch
-        uses: actions/checkout@v2
-  
-      - name: Container Security 
-        run: |
-            pwd
-            export VERACODE_API_KEY_ID=${{ secrets.VERACODE_API_ID }}
-            export VERACODE_API_KEY_SECRET=${{ secrets.VERACODE_API_KEY }}
-            curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-            ./veracode configure
-            ./veracode scan --source /home/runner/work/VerademoJava/VerademoJava --type directory --format table
-            ./veracode scan --source /home/runner/work/VerademoJava/VerademoJava --type directory --format json --output ./veracode_container_scan.json
-    
-      - name: save output file
-        uses: actions/upload-artifact@v2
-        with:
-          name: json-report
-          path: ./veracode_container_scan.json
+
+  container-scan:
+      runs-on: ubuntu-latest
+      name: container scan
+
+      steps:
+        - name: checkout
+          uses: actions/checkout@v2
+
+        - name: container-scan action step
+          id: container-scan
+          uses: ./
+          with:
+            vid: ${{ secrets.VERACODE_API_ID }}
+            vkey: ${{ secrets.VERACODE_API_KEY }}
+            command: "scan" 
+            type: "directory"
+            source: "./"
+            format: "json"
+            debug: 1
+            fail_build: true
