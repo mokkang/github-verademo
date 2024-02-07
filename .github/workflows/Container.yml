@@ -25,7 +25,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: verademo
-          path: ~/
+          path: ~/verademo.war
       - name: Confirm Contents
         run: ls -la */*
       - name: Get Present Directory
@@ -36,7 +36,7 @@ jobs:
           # Artifact name
           name: verademo
           # Destination path
-          path: ~/
+          path: ~/verademo.war
       - name: Veracode Upload And Scan
           # You may pin to the exact commit or the version.
           # uses: veracode/veracode-uploadandscan-action@98e2a2941b985e55bfe469ebcb970b2e686625e4
