@@ -26,7 +26,10 @@ jobs:
         with:
           name: verademo
           path: ~/
-
+      - name: Confirm Contents
+        run: ls -la */*
+      - name: Get Present Directory
+        run: pwd
       - name: Download a Build Artifact
         uses: actions/download-artifact@v3.0.2
         with:
