@@ -17,9 +17,9 @@ jobs:
             export VERACODE_API_KEY_ID=${{ secrets.VERACODE_API_ID }}
             export VERACODE_API_KEY_SECRET=${{ secrets.VERACODE_API_KEY }}
             curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-            ./veracode scan --source /home/runner/work/github-verademo/github-verademo --type directory --format table
-            ./veracode scan --source /home/runner/work/github-verademo/github-verademo --type directory --format json --output ./veracode_container_scan.json
-    
+            # ./veracode scan --source /home/runner/work/github-verademo/github-verademo --type directory --format table
+            # ./veracode scan --source /home/runner/work/github-verademo/github-verademo --type directory --format json --output ./veracode_container_scan.json
+            ./veracode package -s . --output app/target/ --type repo --trust
       - name: save output file
         uses: actions/upload-artifact@v2
         with:
