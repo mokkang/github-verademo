@@ -25,7 +25,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: verademo
-          path: /home/runner/work/github-verademo/github-verademo/verademo.war
+          path: /home/runner/work/github-verademo/github-verademo/
 
       - name: Veracode Upload And Scan
           # You may pin to the exact commit or the version.
