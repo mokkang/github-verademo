@@ -16,7 +16,8 @@ jobs:
             export VERACODE_API_KEY_ID=${{ secrets.VERACODE_API_ID }}
             export VERACODE_API_KEY_SECRET=${{ secrets.VERACODE_API_KEY }}
             curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-            ./veracode package --source . -o . -a 
+            ./veracode scan --source alpine:latest --type image --format table --output results.json
+          #  ./veracode package --source . -o . -a 
            
 
 
