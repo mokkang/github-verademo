@@ -25,8 +25,15 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: verademo
-          path: /home/runner/work/github-verademo/github-verademo/
+          path: ~/
 
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          # Artifact name
+          name: verademo
+          # Destination path
+          path: ~/
       - name: Veracode Upload And Scan
           # You may pin to the exact commit or the version.
           # uses: veracode/veracode-uploadandscan-action@98e2a2941b985e55bfe469ebcb970b2e686625e4
