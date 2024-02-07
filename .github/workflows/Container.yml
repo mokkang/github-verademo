@@ -37,7 +37,7 @@ jobs:
           # createprofile
           createprofile: true # default is true
            # filepath
-          filepath: /home/runner/work/github-verademo/github-verademo/verademo.war
+          filepath: ~/verademo.war
             # version
           version: ${{ github.run_attempt }}
             # vid # default is Scan from Github job: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
