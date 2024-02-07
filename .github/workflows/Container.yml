@@ -10,7 +10,7 @@ jobs:
       - name: Check out branch
         uses: actions/checkout@v2
   
-      - name: Container Security 
+      - name: Container Security  
         run: |
             pwd
             export VERACODE_API_KEY_ID=${{ secrets.VERACODE_API_ID }}
