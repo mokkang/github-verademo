@@ -17,7 +17,6 @@ jobs:
             export VERACODE_API_KEY_SECRET=${{ secrets.VERACODE_API_KEY }}
             curl -fsS https://tools.veracode.com/veracode-cli/install | sh
             ./veracode scan --source alpine:latest --type image --format table --output results.json
-          #  ./veracode package --source . -o . -a 
            
 
 
@@ -25,37 +24,37 @@ jobs:
       - name: save output file
         uses: actions/upload-artifact@v2
         with:
-          name: verademo
-          path: ~/verademo.war
+          name: results.json
+          path: .
       - name: Confirm Contents
         run: ls -la */*
       - name: Get Present Directory
         run: pwd
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v3.0.2
-        with:
-          # Artifact name
-          name: verademo
-          # Destination path
-          path: ~/verademo.war
-      - name: Veracode Upload And Scan
-          # You may pin to the exact commit or the version.
-          # uses: veracode/veracode-uploadandscan-action@98e2a2941b985e55bfe469ebcb970b2e686625e4
-        uses: veracode/veracode-uploadandscan-action@0.2.6
-        with:
-            # appname
-          appname: Testing-packager # default is ${{ github.repository }}
-          # createprofile
-          createprofile: true # default is true
-           # filepath
-          filepath: ~/verademo.war
-            # version
-          version: ${{ github.run_attempt }}
-            # vid # default is Scan from Github job: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
-            # vid
-          vid: ${{ secrets.VERACODE_API_ID }}
-            # vkey
-          vkey: ${{ secrets.VERACODE_API_KEY }}
+      # - name: Download a Build Artifact
+      #   uses: actions/download-artifact@v3.0.2
+      #   with:
+      #     # Artifact name
+      #     name: verademo
+      #     # Destination path
+      #     path: ~/verademo.war
+      # - name: Veracode Upload And Scan
+      #     # You may pin to the exact commit or the version.
+      #     # uses: veracode/veracode-uploadandscan-action@98e2a2941b985e55bfe469ebcb970b2e686625e4
+      #   uses: veracode/veracode-uploadandscan-action@0.2.6
+      #   with:
+      #       # appname
+      #     appname: Testing-packager # default is ${{ github.repository }}
+      #     # createprofile
+      #     createprofile: true # default is true
+      #      # filepath
+      #     filepath: ~/verademo.war
+      #       # version
+      #     version: ${{ github.run_attempt }}
+      #       # vid # default is Scan from Github job: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      #       # vid
+      #     vid: ${{ secrets.VERACODE_API_ID }}
+      #       # vkey
+      #     vkey: ${{ secrets.VERACODE_API_KEY }}
           #   # true or false
           # createsandbox: # optional
           #   # name of the sandbox
